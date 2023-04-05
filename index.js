@@ -11,9 +11,24 @@ const existingRoles = ["Admin", "Manager", "Tester", "Client"];
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+const getUserDTO = (user) => {
+  return {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    fullName: `${user.firstName} ${user.lastName}`,
+    email: user.email,
+    role: user.role,
+    country: user.country,
+    createdAt: user.createdAt,
+    phoneNumber: user.phoneNumber,
+  };
+};
 
 app.get("/", function (req, res) {
-  res.send(users);
+  // const usersResponse = users.map((user) => getUserDTO(user));
+  const usersResponse = users.map(getUserDTO);
+  res.send(usersResponse);
 });
 
 app.get("/:id", function (req, res) {
@@ -22,7 +37,7 @@ app.get("/:id", function (req, res) {
   if (!user) {
     return res.status(404).send("User not found");
   }
-  res.send(user);
+  res.send(getUserDTO(user));
 });
 
 app.post("/", function (req, res) {
@@ -34,7 +49,7 @@ app.post("/", function (req, res) {
   }
   const id = uuidv4();
   users.push({ ...newUser, id });
-  return res.send({ ...newUser, id });
+  return res.send(getUserDTO({ ...newUser, id }));
 });
 
 app.get("/filtered/:role", function (req, res) {
@@ -46,7 +61,8 @@ app.get("/filtered/:role", function (req, res) {
   if (filteredUsers.length === 0) {
     return res.status(404).send(`No users with role: "${role}".`);
   }
-  res.send(filteredUsers);
+  const filteredUsersDTO = getUserDTO(filteredUsers);
+  res.send(filteredUsersDTO);
 });
 
 app.delete("/:id", function (req, res) {
@@ -62,13 +78,14 @@ app.delete("/:id", function (req, res) {
 
 app.put("/:id", function (req, res) {
   const id = req.params.id;
-  const user = users.find((u) => u.id === id);
+  const user = JSON.parse(JSON.stringify(users.find((u) => u.id === id)));
   if (!user) {
     return res.status(404).send("User not found!");
   }
   const userCreatedYear = user.createdAt.slice(0, 4);
-  user.message = `You registered in ${userCreatedYear}!`;
-  res.send(user);
+  const message = `You registered in ${userCreatedYear}!`;
+  const userDTO = getUserDTO(user);
+  res.send({ ...userDTO, message });
 });
 
 app.patch("/:id", function (req, res) {
