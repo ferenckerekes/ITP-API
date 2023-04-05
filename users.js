@@ -2200,3 +2200,4 @@ const USERS = [
     role: "Client",
   },
 ];
+module.exports = USERS;
