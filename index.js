@@ -1,5 +1,6 @@
 const { json } = require("express");
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const bodyParser = require("body-parser");
 const USERS = require("./users");
@@ -7,6 +8,7 @@ const users = USERS;
 const { v4: uuidv4 } = require("uuid");
 const existingRoles = ["Admin", "Manager", "Tester", "Client"];
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
