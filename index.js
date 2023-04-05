@@ -26,9 +26,25 @@ const getUserDTO = (user) => {
 };
 
 app.get("/", function (req, res) {
+  const roleFilter = req.query.role;
+  if (roleFilter) {
+    console.log("Role filter: " + roleFilter);
+    if (!existingRoles.map((role) => role.toLowerCase()).includes(roleFilter)) {
+      return res.status(400).send("Invalid role");
+    }
+    const filteredUsers = users.filter(
+      (u) => u.role.toLowerCase() === roleFilter
+    );
+    if (filteredUsers.length === 0) {
+      return res.status(404).send(`No users with role: "${roleFilter}".`);
+    }
+    console.log(filteredUsers);
+    return res.send(filteredUsers.map(getUserDTO));
+  }
+
   // const usersResponse = users.map((user) => getUserDTO(user));
   const usersResponse = users.map(getUserDTO);
-  res.send(usersResponse);
+  return res.send(usersResponse);
 });
 
 app.get("/:id", function (req, res) {
@@ -37,7 +53,7 @@ app.get("/:id", function (req, res) {
   if (!user) {
     return res.status(404).send("User not found");
   }
-  res.send(getUserDTO(user));
+  return res.send(getUserDTO(user));
 });
 
 app.post("/", function (req, res) {
@@ -61,8 +77,8 @@ app.get("/filtered/:role", function (req, res) {
   if (filteredUsers.length === 0) {
     return res.status(404).send(`No users with role: "${role}".`);
   }
-  const filteredUsersDTO = getUserDTO(filteredUsers);
-  res.send(filteredUsersDTO);
+  const filteredUsersDTO = filteredUsers.map(getUserDTO);
+  return res.send(filteredUsersDTO);
 });
 
 app.delete("/:id", function (req, res) {
@@ -85,7 +101,7 @@ app.put("/:id", function (req, res) {
   const userCreatedYear = user.createdAt.slice(0, 4);
   const message = `You registered in ${userCreatedYear}!`;
   const userDTO = getUserDTO(user);
-  res.send({ ...userDTO, message });
+  return res.send({ ...userDTO, message });
 });
 
 app.patch("/:id", function (req, res) {
@@ -95,7 +111,7 @@ app.patch("/:id", function (req, res) {
     return res.status(404).send("User not found!");
   }
   user.firstName = user.firstName.toUpperCase();
-  res.send(user);
+  return res.send(user);
 });
 
 app.listen(3000, () => {
