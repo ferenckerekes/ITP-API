@@ -1,4 +1,5 @@
-GET http://localhost:3000/filtered/admin
+GET http://localhost:3000/users
 
 
-PUT http://localhost:3000/4945ee5a-8003-4143-bc03-590f25cdfba4
+
+GET  http://localhost:3000/users/4945ee5a-8003-4143-bc03-590f25cdfba4
